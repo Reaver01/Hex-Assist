@@ -1,0 +1,22 @@
+{
+	"name": "Hex-Assist",
+	"title": "Hex Crawl Assist",
+	"author": "Reaver01",
+	"description": "Automatically reveals nearby hexes for hex crawls.",
+	"version": "0.0.1",
+	"minimumCoreVersion": "0.5.5",
+	"scripts": ["./hex-assist.js"],
+	"styles": [],
+	"packs": [{
+		"name": "hex-assist-macros",
+		"label": "Hex Assist Macros",
+		"module": "Hex-Assist",
+		"path": "./packs/hex-assist-macros.db",
+		"system": "dnd5e",
+		"entity": "Macro"
+	}],
+	"socket": true,
+	"download": "https://github.com/reaver01/Hex-Assist/archive/master.zip",
+	"manifest": "https://raw.githubusercontent.com/reaver01/Hex-Assist/master/module.json",
+	"url": "https://github.com/reaver01/Hex-Assist"
+}
