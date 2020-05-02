@@ -24,7 +24,7 @@ The names are pretty self explanitory.
 - Hex-Assist now has settings! You can configure the token and tile names to match what you want, instead of what I want!
 - Made hiding and showing tiles use updateEmbeddedEntitiy so we can hide/show tiles all at once.
 - Added a folder for Macros so changes can be seen. These will also be included in a compendium.
-- Macros use Hex-Assist settings. Unfortuntely this means you can't use the macros by themselves, but it'll keep everything more consistent.
+- Macros use Hex-Assist settings. Unfortunately this means you can't use the macros by themselves, but it'll keep everything more consistent.
 
 # Future Plans
 - Support for Hexagonal Rows
