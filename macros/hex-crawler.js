@@ -1,5 +1,14 @@
-if (canvas.tokens.controlled.length === 0)
+const navigatorName = game.settings.get("Hex-Assist", "navigator");
+let defaultNavigator;
+if (canvas.tokens.controlled.length === 0 && !navigatorName) {
     return ui.notifications.error("Please select the token of the Navigator!");
+} else if (navigatorName) {
+    console.log(navigatorName);
+    defaultNavigator = game.actors.entities.find(a => a.data.name === navigatorName);
+    if (!defaultNavigator) {
+        return ui.notifications.error("Please select the token of the Navigator!");
+    }
+}
 
 const playerMarker = canvas.scene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "tokenName"));
 const locationMarker = canvas.scene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "actualName"));
@@ -73,10 +82,16 @@ new Dialog({
         const weatherTable = game.tables.entities.find(t => t.name === "weather");
         const directions = ["North", "Northeast", "Northwest", "South", "Southeast", "Southwest"];
         const encounterTable = game.tables.entities.find(t => t.name === hexType);
-        let weatherRoll = weatherTable.roll()[1].text;
+        let weatherRoll = weatherTable.roll().results[0].text;
         let lostDirection = directions[Math.floor(Math.random() * directions.length)];;
         let msgContent = '<strong>Weather</strong> ' + weatherRoll + '<br/><br/>';
-        let navigator = Actors.instance.get(canvas.tokens.controlled[0].data.actorId);
+        let navigator = defaultNavigator;
+        if (!navigator) {
+            navigator = Actors.instance.get(canvas.tokens.controlled[0].data.actorId);
+        }
+        if (!navigator) {
+            return;
+        }
         let wis = navigator.data.data.abilities.wis.mod;
         let survival = new Roll(`1d20`).roll().total + wis;
         let survival2 = new Roll(`1d20`).roll().total + wis;
@@ -296,7 +311,7 @@ new Dialog({
         msgContent += '<strong>Morning Encounter:</strong> ';
 
         if (new Roll(`1d20`).roll().total > 15) {
-            encounter = encounterTable.roll()[1].text;
+            encounter = encounterTable.roll().results[0].text;
             msgContent += encounter;
             msgContent += '<br/><br/><strong>Afternoon Encounter:</strong> ';
         } else {
@@ -304,7 +319,7 @@ new Dialog({
         }
 
         if (new Roll(`1d20`).roll().total > 15) {
-            encounter = encounterTable.roll()[1].text;
+            encounter = encounterTable.roll().results[0].text;
             msgContent += encounter;
             msgContent += '<br/><br/><strong>Evening Encounter:</strong> ';
         } else {
@@ -312,19 +327,33 @@ new Dialog({
         }
 
         if (new Roll(`1d20`).roll().total > 15) {
-            encounter = encounterTable.roll()[1].text;
+            encounter = encounterTable.roll().results[0].text;
             msgContent += encounter;
         } else {
             msgContent += 'None.';
         }
 
-        let chatData = {
-            content: msgContent,
-            whisper: game.users.entities.filter(u => u.isGM).map(u => u._id)
-        };
-        ChatMessage.create(chatData, {});
-        game.Gametime.advanceTime({
-            days: 1
-        })
+        if (game.settings.get("Hex-Assist", "journal")) {
+            let journal = game.journal.entities.find(j => j.data.name === "Encounters");
+            if (journal) {
+                journal.update({content: msgContent})
+            } else {
+                JournalEntry.create({name: "Encounters", content: msgContent});
+                journal = game.journal.entities.find(j => j.data.name === "Encounters");
+            }
+            journal.show();
+        } else {
+            let chatData = {
+                content: msgContent,
+                whisper: game.users.entities.filter(u => u.isGM).map(u => u._id)
+            };
+            ChatMessage.create(chatData, {});
+        }
+
+        if (game.modules.get("calendar-weather") && game.settings.get("Hex-Assist", "day")) {
+            game.Gametime.advanceTime({
+                days: 1
+            })
+        }
     }
 }).render(true);

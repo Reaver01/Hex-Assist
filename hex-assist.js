@@ -72,5 +72,37 @@ const HexAssist = (() => {
             default: "tile.png",
             type: String
         });
+        game.settings.register("Hex-Assist", "navigator", {
+            name: "Default Navigator Name",
+            hint: "Name of the actor that Hex Assist should look for if no token is selected.",
+            scope: "world",
+            config: true,
+            default: "",
+            type: String
+        });
+        game.settings.register("Hex-Assist", "day", {
+            name: "Advance Day",
+            hint: "Advance to the next day when using the Hex Crawl Macro.",
+            scope: "world",
+            config: true,
+            default: false,
+            type: Boolean
+        });
+        game.settings.register("Hex-Assist", "journal", {
+            name: "Create Journal Entry",
+            hint: "Create/update Encounters journal entry instead of outputting to chat.",
+            scope: "world",
+            config: true,
+            default: false,
+            type: Boolean
+        });
+        game.settings.register("Hex-Assist", "journalName", {
+            name: "Journal Entry Name",
+            hint: "Name of the Jounrnal Entry to use for output.",
+            scope: "world",
+            config: true,
+            default: "Encounters",
+            type: String
+        });
     });
 })();
