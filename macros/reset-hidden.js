@@ -1,4 +1,4 @@
-const scene = game.scenes.active;
+const activeScene = game.scenes.active;
 const sceneTiles = canvas.scene.data.tiles.reduce((updates, t) => {
 
     if (t.img.indexOf(game.settings.get("Hex-Assist", "tileName")) > -1 && t.hidden === true) {
@@ -12,4 +12,4 @@ const sceneTiles = canvas.scene.data.tiles.reduce((updates, t) => {
     }
 }, []);
 const updates = sceneTiles;
-scene.updateEmbeddedEntity("Tile", updates);
+activeScene.updateEmbeddedEntity("Tile", updates);
