@@ -98,7 +98,7 @@ const HexAssist = (() => {
         });
         game.settings.register("Hex-Assist", "journalName", {
             name: "Journal Entry Name",
-            hint: "Name of the Jounrnal Entry to use for output.",
+            hint: "Name of the Journal Entry to use for output.",
             scope: "world",
             config: true,
             default: "Encounters",
