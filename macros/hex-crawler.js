@@ -10,20 +10,24 @@ if (canvas.tokens.controlled.length === 0 && !navigatorName) {
     }
 }
 
-const playerMarker = canvas.scene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "tokenName"));
-const locationMarker = canvas.scene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "actualName"));
-const directionMarker = canvas.scene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "direction"));
+const currentScene = canvas.scene;
+const playerMarker = currentScene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "tokenName"));
+const locationMarker = currentScene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "actualName"));
+const directionMarker = currentScene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "direction"));
 
-const pX = playerMarker.x;
-const pY = playerMarker.y;
-const dX = directionMarker.x;
-const dY = directionMarker.y;
+let pX = playerMarker.x;
+let pY = playerMarker.y;
+let dX = directionMarker.x;
+let dY = directionMarker.y;
+let lX = locationMarker.x;
+let lY = locationMarker.y;
 
 const gridSize = canvas.grid.size;
 const vertical = gridSize * 0.866666;
 const diagVertical = gridSize * 0.433333;
 const diagHorizontal = gridSize * 0.75;
 const range = gridSize / 10;
+let updates = [];
 
 let formContent = `
 <form>
@@ -162,48 +166,35 @@ new Dialog({
         if (((hexType === 'coast' || hexType === 'ruins') && survival < 10) || ((hexType === 'jungle1' || hexType === 'jungle2' || hexType === 'jungle3' || hexType === 'mountains' || hexType === 'rivers' || hexType === 'swamp' || hexType === 'wasteland') && survival < 15)) {
             msgContent += '<strong>Party is Lost:</strong> Move actual location ' + hexesMoved + ' ' + hexText + ' to the ' + lostDirection + '<br/><br/>';
             if (locationMarker) {
-                const locToken = canvas.tokens.get(locationMarker._id);
                 switch (lostDirection) {
                     case 'South':
-                        locToken.update({
-                            x: locToken.x,
-                            y: locToken.y + (vertical * hexesMoved)
-                        });
+                        lX = locationMarker.x;
+                        lY = locationMarker.y + (vertical * hexesMoved);
                         break;
 
                     case 'Southwest':
-                        locToken.update({
-                            x: locToken.x - (diagHorizontal * hexesMoved),
-                            y: locToken.y + (diagVertical * hexesMoved)
-                        });
+                        lX = locationMarker.x - (diagHorizontal * hexesMoved);
+                        lY = locationMarker.y + (diagVertical * hexesMoved);
                         break;
 
                     case 'Southeast':
-                        locToken.update({
-                            x: locToken.x + (diagHorizontal * hexesMoved),
-                            y: locToken.y + (diagVertical * hexesMoved)
-                        });
+                        lX = locationMarker.x + (diagHorizontal * hexesMoved);
+                        lY = locationMarker.y + (diagVertical * hexesMoved);
                         break;
 
                     case 'North':
-                        locToken.update({
-                            x: locToken.x,
-                            y: locToken.y - (vertical * hexesMoved)
-                        });
+                        lX = locationMarker.x;
+                        lY = locationMarker.y - (vertical * hexesMoved);
                         break;
 
                     case 'Northwest':
-                        locToken.update({
-                            x: locToken.x - (diagHorizontal * hexesMoved),
-                            y: locToken.y - (diagVertical * hexesMoved)
-                        });
+                        lX = locationMarker.x - (diagHorizontal * hexesMoved);
+                        lY = locationMarker.y - (diagVertical * hexesMoved);
                         break;
 
                     case 'Northeast':
-                        locToken.update({
-                            x: locToken.x + (diagHorizontal * hexesMoved),
-                            y: locToken.y - (diagVertical * hexesMoved)
-                        });
+                        lX = locationMarker.x + (diagHorizontal * hexesMoved);
+                        lY = locationMarker.y - (diagVertical * hexesMoved);
                         break;
 
                     default:
@@ -211,48 +202,35 @@ new Dialog({
                 }
             }
             if (playerMarker) {
-                const playerToken = canvas.tokens.get(playerMarker._id);
                 switch (playerDirection) {
                     case 'South':
-                        playerToken.update({
-                            x: playerToken.x,
-                            y: playerToken.y + (vertical * hexesMoved)
-                        });
+                        pX = playerMarker.x;
+                        pY = playerMarker.y + (vertical * hexesMoved);
                         break;
 
                     case 'Southwest':
-                        playerToken.update({
-                            x: playerToken.x - (diagHorizontal * hexesMoved),
-                            y: playerToken.y + (diagVertical * hexesMoved)
-                        });
+                        pX = playerMarker.x - (diagHorizontal * hexesMoved);
+                        pY = playerMarker.y + (diagVertical * hexesMoved);
                         break;
 
                     case 'Southeast':
-                        playerToken.update({
-                            x: playerToken.x + (diagHorizontal * hexesMoved),
-                            y: playerToken.y + (diagVertical * hexesMoved)
-                        });
+                        pX = playerMarker.x + (diagHorizontal * hexesMoved);
+                        pY = playerMarker.y + (diagVertical * hexesMoved);
                         break;
 
                     case 'North':
-                        playerToken.update({
-                            x: playerToken.x,
-                            y: playerToken.y - (vertical * hexesMoved)
-                        });
+                        pX = playerMarker.x;
+                        pY = playerMarker.y - (vertical * hexesMoved);
                         break;
 
                     case 'Northwest':
-                        playerToken.update({
-                            x: playerToken.x - (diagHorizontal * hexesMoved),
-                            y: playerToken.y - (diagVertical * hexesMoved)
-                        });
+                        pX = playerMarker.x - (diagHorizontal * hexesMoved);
+                        pY = playerMarker.y - (diagVertical * hexesMoved);
                         break;
 
                     case 'Northeast':
-                        playerToken.update({
-                            x: playerToken.x + (diagHorizontal * hexesMoved),
-                            y: playerToken.y - (diagVertical * hexesMoved)
-                        });
+                        pX = playerMarker.x + (diagHorizontal * hexesMoved);
+                        pY = playerMarker.y - (diagVertical * hexesMoved);
                         break;
 
                     default:
@@ -261,80 +239,74 @@ new Dialog({
             }
         } else {
             if (playerMarker && locationMarker) {
-                const locToken = canvas.tokens.get(locationMarker._id);
-                const playerToken = canvas.tokens.get(playerMarker._id);
 
                 switch (playerDirection) {
                     case 'South':
-                        playerToken.update({
-                            x: locToken.x,
-                            y: locToken.y + (vertical * hexesMoved)
-                        });
-                        locToken.update({
-                            x: locToken.x,
-                            y: locToken.y + (vertical * hexesMoved)
-                        });
+                        pX = locationMarker.x;
+                        pY = locationMarker.y + (vertical * hexesMoved);
+                        lX = locationMarker.x;
+                        lY = locationMarker.y + (vertical * hexesMoved);
                         break;
 
                     case 'Southwest':
-                        playerToken.update({
-                            x: locToken.x - (diagHorizontal * hexesMoved),
-                            y: locToken.y + (diagVertical * hexesMoved)
-                        });
-                        locToken.update({
-                            x: locToken.x - (diagHorizontal * hexesMoved),
-                            y: locToken.y + (diagVertical * hexesMoved)
-                        });
+                        pX = locationMarker.x - (diagHorizontal * hexesMoved);
+                        pY = locationMarker.y + (diagVertical * hexesMoved);
+                        lX = locationMarker.x - (diagHorizontal * hexesMoved);
+                        lY = locationMarker.y + (diagVertical * hexesMoved);
                         break;
 
                     case 'Southeast':
-                        playerToken.update({
-                            x: locToken.x + (diagHorizontal * hexesMoved),
-                            y: locToken.y + (diagVertical * hexesMoved)
-                        });
-                        locToken.update({
-                            x: locToken.x + (diagHorizontal * hexesMoved),
-                            y: locToken.y + (diagVertical * hexesMoved)
-                        });
+                        pX = locationMarker.x + (diagHorizontal * hexesMoved);
+                        pY = locationMarker.y + (diagVertical * hexesMoved);
+                        lX = locationMarker.x + (diagHorizontal * hexesMoved);
+                        lY = locationMarker.y + (diagVertical * hexesMoved);
                         break;
 
                     case 'North':
-                        playerToken.update({
-                            x: locToken.x,
-                            y: locToken.y - (vertical * hexesMoved)
-                        });
-                        locToken.update({
-                            x: locToken.x,
-                            y: locToken.y - (vertical * hexesMoved)
-                        });
+                        pX = locationMarker.x;
+                        pY = locationMarker.y - (vertical * hexesMoved);
+                        lX = locationMarker.x;
+                        lY = locationMarker.y - (vertical * hexesMoved);
                         break;
 
                     case 'Northwest':
-                        playerToken.update({
-                            x: locToken.x - (diagHorizontal * hexesMoved),
-                            y: locToken.y - (diagVertical * hexesMoved)
-                        });
-                        locToken.update({
-                            x: locToken.x - (diagHorizontal * hexesMoved),
-                            y: locToken.y - (diagVertical * hexesMoved)
-                        });
+                        pX = locationMarker.x - (diagHorizontal * hexesMoved);
+                        pY = locationMarker.y - (diagVertical * hexesMoved);
+                        lX = locationMarker.x - (diagHorizontal * hexesMoved);
+                        lY = locationMarker.y - (diagVertical * hexesMoved);
                         break;
 
                     case 'Northeast':
-                        playerToken.update({
-                            x: locToken.x + (diagHorizontal * hexesMoved),
-                            y: locToken.y - (diagVertical * hexesMoved)
-                        });
-                        locToken.update({
-                            x: locToken.x + (diagHorizontal * hexesMoved),
-                            y: locToken.y - (diagVertical * hexesMoved)
-                        });
+                        pX = locationMarker.x + (diagHorizontal * hexesMoved);
+                        pY = locationMarker.y - (diagVertical * hexesMoved);
+                        lX = locationMarker.x + (diagHorizontal * hexesMoved);
+                        lY = locationMarker.y - (diagVertical * hexesMoved);
                         break;
 
                     default:
                         break;
                 }
             }
+        }
+
+        if (playerMarker) {
+            updates.push({
+                _id: playerMarker._id,
+                x: pX,
+                y: pY
+            });
+        }
+
+        if (locationMarker) {
+            updates.push({
+                _id: locationMarker._id,
+                x: lX,
+                y: lY
+            });
+        }
+
+        if (updates.length > 0) {
+            currentScene.updateEmbeddedEntity("Token", updates);
         }
 
         msgContent += '<strong>Morning Encounter:</strong> ';
