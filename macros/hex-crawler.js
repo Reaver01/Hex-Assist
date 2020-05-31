@@ -98,17 +98,13 @@ new Dialog({
                 playerDirection = "North";
             } else if (dY > pY && (dX === pX || (dX > pX - range && dX < pX + range))) {
                 playerDirection = "South";
-            } else if (dX < pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
-                playerDirection = "Southwest";
-            } else if (dX > pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
-                playerDirection = "Southeast";
             } else if (dX < pX && dY < pY) {
                 playerDirection = "Northwest";
             } else if (dX > pX && dY < pY) {
                 playerDirection = "Northeast";
-            } else if (dX < pX && dY > pY) {
+            } else if ((dX < pX && dY > pY) || (dX < pX && (dX === pX || (dY > pY - range && dY < pY + range)))) {
                 playerDirection = "Southwest";
-            } else if (dX > pX && dY > pY) {
+            } else if ((dX > pX && dY > pY) || (dX > pX && (dX === pX || (dY > pY - range && dY < pY + range)))) {
                 playerDirection = "Southeast";
             }
         }
