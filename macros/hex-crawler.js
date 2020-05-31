@@ -12,51 +12,65 @@ if (canvas.tokens.controlled.length === 0 && !navigatorName) {
 
 const playerMarker = canvas.scene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "tokenName"));
 const locationMarker = canvas.scene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "actualName"));
+const directionMarker = canvas.scene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "direction"));
+
+const pX = playerMarker.x;
+const pY = playerMarker.y;
+const dX = directionMarker.x;
+const dY = directionMarker.y;
 
 const gridSize = canvas.grid.size;
 const vertical = gridSize * 0.866666;
 const diagVertical = gridSize * 0.433333;
 const diagHorizontal = gridSize * 0.75;
+const range = gridSize / 10;
+
+let formContent = `
+<form>
+    <div class="form-group">
+        <label>Hex Type:</label>
+        <select id="hex-type" name="hex-type">
+            <option value="coast">Coast</option>
+            <option value="jungle1">Jungle: No Undead</option>
+            <option value="jungle2">Jungle: Lesser Undead</option>
+            <option value="jungle3">Jungle: Greater Undead</option>
+            <option value="mountains">Mountains</option>
+            <option value="rivers">River</option>
+            <option value="ruins">Ruins</option>
+            <option value="swamp">Swamp</option>
+            <option value="wasteland">Wasteland</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Travel Direction:</label>
+        <select id="travel-direction" name="travel-direction">
+`;
+if (directionMarker) {
+    formContent += `<option value="Marker">Marker</option>`;
+}
+formContent += `
+            <option value="North">North</option>
+            <option value="Northeast">Northeast</option>
+            <option value="Southeast">Southeast</option>
+            <option value="South">South</option>
+            <option value="Southwest">Southwest</option>
+            <option value="Northwest">Northwest</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Travel Type:</label>
+        <select id="travel-type" name="travel-type">
+            <option value="on-foot">On Foot</option>
+            <option value="canoe">By Canoe</option>
+        </select>
+    </div>
+</form>
+`;
 
 let pace = 'none';
 new Dialog({
     title: `Hex Crawl Helper`,
-    content: `
-    <form>
-        <div class="form-group">
-            <label>Hex Type:</label>
-            <select id="hex-type" name="hex-type">
-                <option value="coast">Coast</option>
-                <option value="jungle1">Jungle: No Undead</option>
-                <option value="jungle2">Jungle: Lesser Undead</option>
-                <option value="jungle3">Jungle: Greater Undead</option>
-                <option value="mountains">Mountains</option>
-                <option value="rivers">River</option>
-                <option value="ruins">Ruins</option>
-                <option value="swamp">Swamp</option>
-                <option value="wasteland">Wasteland</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Travel Direction:</label>
-            <select id="travel-direction" name="travel-direction">
-                <option value="North">North</option>
-                <option value="Northeast">Northeast</option>
-                <option value="Southeast">Southeast</option>
-                <option value="South">South</option>
-                <option value="Southwest">Southwest</option>
-                <option value="Northwest">Northwest</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Travel Type:</label>
-            <select id="travel-type" name="travel-type">
-                <option value="on-foot">On Foot</option>
-                <option value="canoe">By Canoe</option>
-            </select>
-        </div>
-    </form>
-    `,
+    content: formContent,
     buttons: {
         slow: {
             icon: "<i class='fas fa-user-ninja'></i>",
@@ -79,6 +93,25 @@ new Dialog({
         let hexType = html.find('[name="hex-type"]')[0].value;
         let travelType = html.find('[name="travel-type"]')[0].value;
         let playerDirection = html.find('[name="travel-direction"]')[0].value;
+        if (playerDirection === "Marker") {
+            if (dY < pY && (dX === pX || (dX > pX - range && dX < pX + range))) {
+                playerDirection = "North";
+            } else if (dY > pY && (dX === pX || (dX > pX - range && dX < pX + range))) {
+                playerDirection = "South";
+            } else if (dX < pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
+                playerDirection = "Southwest";
+            } else if (dX > pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
+                playerDirection = "Southeast";
+            } else if (dX < pX && dY < pY) {
+                playerDirection = "Northwest";
+            } else if (dX > pX && dY < pY) {
+                playerDirection = "Northeast";
+            } else if (dX < pX && dY > pY) {
+                playerDirection = "Southwest";
+            } else if (dX > pX && dY > pY) {
+                playerDirection = "Southeast";
+            }
+        }
         const weatherTable = game.tables.entities.find(t => t.name === "weather");
         const directions = ["North", "Northeast", "Northwest", "South", "Southeast", "Southwest"];
         const encounterTable = game.tables.entities.find(t => t.name === hexType);
@@ -336,9 +369,14 @@ new Dialog({
         if (game.settings.get("Hex-Assist", "journal")) {
             let journal = game.journal.entities.find(j => j.data.name === "Encounters");
             if (journal) {
-                journal.update({content: msgContent})
+                journal.update({
+                    content: msgContent
+                })
             } else {
-                JournalEntry.create({name: "Encounters", content: msgContent});
+                JournalEntry.create({
+                    name: "Encounters",
+                    content: msgContent
+                });
                 journal = game.journal.entities.find(j => j.data.name === "Encounters");
             }
             journal.show();

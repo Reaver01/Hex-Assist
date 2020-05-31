@@ -104,5 +104,13 @@ const HexAssist = (() => {
             default: "Encounters",
             type: String
         });
+        game.settings.register("Hex-Assist", "direction", {
+            name: "Marker Token Name",
+            hint: "Name of the Map marker token to use for direction.",
+            scope: "world",
+            config: true,
+            default: "Direction Marker",
+            type: String
+        });
     });
 })();
