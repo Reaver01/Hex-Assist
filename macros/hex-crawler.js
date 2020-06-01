@@ -1,9 +1,9 @@
 const navigatorName = game.settings.get("Hex-Assist", "navigator");
 let defaultNavigator;
+
 if (canvas.tokens.controlled.length === 0 && !navigatorName) {
     return ui.notifications.error("Please select the token of the Navigator!");
 } else if (navigatorName) {
-    console.log(navigatorName);
     defaultNavigator = game.actors.entities.find(a => a.data.name === navigatorName);
     if (!defaultNavigator) {
         return ui.notifications.error("Please select the token of the Navigator!");
@@ -11,21 +11,35 @@ if (canvas.tokens.controlled.length === 0 && !navigatorName) {
 }
 
 const currentScene = canvas.scene;
+const gridType = currentScene.data.gridType;
+
+if (gridType !== 4 && gridType !== 2) {
+    return ui.notifications.error("The current grid is not a Hex Grid!");
+}
+
 const playerMarker = currentScene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "tokenName"));
 const locationMarker = currentScene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "actualName"));
 const directionMarker = currentScene.data.tokens.find(a => a.name === game.settings.get("Hex-Assist", "direction"));
 
 let pX = playerMarker.x;
 let pY = playerMarker.y;
-let dX = directionMarker.x;
-let dY = directionMarker.y;
 let lX = locationMarker.x;
 let lY = locationMarker.y;
+let dX = (directionMarker) ? directionMarker.x : 0;
+let dY = (directionMarker) ? directionMarker.y : 0;
 
 const gridSize = canvas.grid.size;
+
 const vertical = gridSize * 0.866666;
-const diagVertical = gridSize * 0.433333;
-const diagHorizontal = gridSize * 0.75;
+const horizontal = gridSize * 0.866666;
+let diagVertical = gridSize * 0.433333;
+let diagHorizontal = gridSize * 0.75;
+
+if (gridType === 2) {
+    diagVertical = gridSize * 0.75;
+    diagHorizontal = gridSize * 0.433333;
+}
+
 const range = gridSize / 10;
 let updates = [];
 
@@ -52,13 +66,25 @@ let formContent = `
 if (directionMarker) {
     formContent += `<option value="Marker">Marker</option>`;
 }
+if (gridType === 2) {
+    formContent += `<option value="East">East</option>`;
+}
+if (gridType === 4) {
+    formContent += `<option value="North">North</option>`;
+}
+formContent += `<option value="Northeast">Northeast</option>
+                <option value="Northwest">Northwest</option>`;
+if (gridType === 4) {
+    formContent += `<option value="North">South</option>`;
+}
 formContent += `
-            <option value="North">North</option>
-            <option value="Northeast">Northeast</option>
             <option value="Southeast">Southeast</option>
-            <option value="South">South</option>
-            <option value="Southwest">Southwest</option>
-            <option value="Northwest">Northwest</option>
+            <option value="Southwest">Southwest</option>`;
+
+if (gridType === 2) {
+    formContent += `<option value="West">West</option>`;
+}
+formContent += `
         </select>
     </div>
     <div class="form-group">
@@ -99,21 +125,44 @@ new Dialog({
         let playerDirection = html.find('[name="travel-direction"]')[0].value;
         if (playerDirection === "Marker") {
             if (dY < pY && (dX === pX || (dX > pX - range && dX < pX + range))) {
-                playerDirection = "North";
+                if (gridType === 4) {
+                    playerDirection = "North"
+                } else if (gridType === 2) {
+                    playerDirection = "Northwest";
+                }
             } else if (dY > pY && (dX === pX || (dX > pX - range && dX < pX + range))) {
-                playerDirection = "South";
+                if (gridType === 4) {
+                    playerDirection = "South"
+                } else if (gridType === 2) {
+                    playerDirection = "Southwest";
+                }
+            } else if (dX < pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
+                if (gridType === 4) {
+                    playerDirection = "Southwest"
+                } else if (gridType === 2) {
+                    playerDirection = "West";
+                }
+            } else if (dX > pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
+                if (gridType === 4) {
+                    playerDirection = "Southeast"
+                } else if (gridType === 2) {
+                    playerDirection = "East";
+                }
             } else if (dX < pX && dY < pY) {
                 playerDirection = "Northwest";
             } else if (dX > pX && dY < pY) {
                 playerDirection = "Northeast";
-            } else if ((dX < pX && dY > pY) || (dX < pX && (dX === pX || (dY > pY - range && dY < pY + range)))) {
+            } else if (dX < pX && dY > pY) {
                 playerDirection = "Southwest";
-            } else if ((dX > pX && dY > pY) || (dX > pX && (dX === pX || (dY > pY - range && dY < pY + range)))) {
+            } else if (dX > pX && dY > pY) {
                 playerDirection = "Southeast";
             }
         }
         const weatherTable = game.tables.entities.find(t => t.name === "weather");
-        const directions = ["North", "Northeast", "Northwest", "South", "Southeast", "Southwest"];
+        let directions = ["North", "Northeast", "Northwest", "South", "Southeast", "Southwest"];
+        if (gridType === 2) {
+            directions = ["West", "Northeast", "Northwest", "East", "Southeast", "Southwest"];
+        }
         const encounterTable = game.tables.entities.find(t => t.name === hexType);
         let weatherRoll = weatherTable.roll().results[0].text;
         let lostDirection = directions[Math.floor(Math.random() * directions.length)];;
@@ -197,6 +246,16 @@ new Dialog({
                         lY = locationMarker.y - (diagVertical * hexesMoved);
                         break;
 
+                    case 'East':
+                        lX = locationMarker.x + (horizontal * hexesMoved);
+                        lY = locationMarker.y;
+                        break;
+
+                    case 'West':
+                        lX = locationMarker.x - (horizontal * hexesMoved);
+                        lY = locationMarker.y;
+                        break;
+
                     default:
                         break;
                 }
@@ -233,6 +292,16 @@ new Dialog({
                         pY = playerMarker.y - (diagVertical * hexesMoved);
                         break;
 
+                    case 'East':
+                        pX = playerMarker.x + (horizontal * hexesMoved);
+                        pY = playerMarker.y;
+                        break;
+
+                    case 'West':
+                        pX = playerMarker.x - (horizontal * hexesMoved);
+                        pY = playerMarker.y;
+                        break;
+
                     default:
                         break;
                 }
@@ -242,45 +311,43 @@ new Dialog({
 
                 switch (playerDirection) {
                     case 'South':
-                        pX = locationMarker.x;
-                        pY = locationMarker.y + (vertical * hexesMoved);
-                        lX = locationMarker.x;
-                        lY = locationMarker.y + (vertical * hexesMoved);
+                        pX = lX = locationMarker.x;
+                        pY = lY = locationMarker.y + (vertical * hexesMoved);
                         break;
 
                     case 'Southwest':
-                        pX = locationMarker.x - (diagHorizontal * hexesMoved);
-                        pY = locationMarker.y + (diagVertical * hexesMoved);
-                        lX = locationMarker.x - (diagHorizontal * hexesMoved);
-                        lY = locationMarker.y + (diagVertical * hexesMoved);
+                        pX = lX = locationMarker.x - (diagHorizontal * hexesMoved);
+                        pY = lY = locationMarker.y + (diagVertical * hexesMoved);
                         break;
 
                     case 'Southeast':
-                        pX = locationMarker.x + (diagHorizontal * hexesMoved);
-                        pY = locationMarker.y + (diagVertical * hexesMoved);
-                        lX = locationMarker.x + (diagHorizontal * hexesMoved);
-                        lY = locationMarker.y + (diagVertical * hexesMoved);
+                        pX = lX = locationMarker.x + (diagHorizontal * hexesMoved);
+                        pY = lY = locationMarker.y + (diagVertical * hexesMoved);
                         break;
 
                     case 'North':
-                        pX = locationMarker.x;
-                        pY = locationMarker.y - (vertical * hexesMoved);
-                        lX = locationMarker.x;
-                        lY = locationMarker.y - (vertical * hexesMoved);
+                        pX = lX = locationMarker.x;
+                        pY = lY = locationMarker.y - (vertical * hexesMoved);
                         break;
 
                     case 'Northwest':
-                        pX = locationMarker.x - (diagHorizontal * hexesMoved);
-                        pY = locationMarker.y - (diagVertical * hexesMoved);
-                        lX = locationMarker.x - (diagHorizontal * hexesMoved);
-                        lY = locationMarker.y - (diagVertical * hexesMoved);
+                        pX = lX = locationMarker.x - (diagHorizontal * hexesMoved);
+                        pY = lY = locationMarker.y - (diagVertical * hexesMoved);
                         break;
 
                     case 'Northeast':
-                        pX = locationMarker.x + (diagHorizontal * hexesMoved);
-                        pY = locationMarker.y - (diagVertical * hexesMoved);
-                        lX = locationMarker.x + (diagHorizontal * hexesMoved);
-                        lY = locationMarker.y - (diagVertical * hexesMoved);
+                        pX = lX = locationMarker.x + (diagHorizontal * hexesMoved);
+                        pY = lY = locationMarker.y - (diagVertical * hexesMoved);
+                        break;
+
+                    case 'East':
+                        pX = lX = locationMarker.x + (horizontal * hexesMoved);
+                        pY = lY = locationMarker.y;
+                        break;
+
+                    case 'West':
+                        pX = lX = locationMarker.x - (horizontal * hexesMoved);
+                        pY = lY = locationMarker.y;
                         break;
 
                     default:
