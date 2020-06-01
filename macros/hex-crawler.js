@@ -125,28 +125,32 @@ new Dialog({
         let playerDirection = html.find('[name="travel-direction"]')[0].value;
         if (playerDirection === "Marker") {
             if (dY < pY && (dX === pX || (dX > pX - range && dX < pX + range))) {
+                if (gridType === 2) {
+                    playerDirection = ["Northeast", "Northwest"][Math.floor(Math.random() * 2)];
+                }
                 if (gridType === 4) {
-                    playerDirection = "North"
-                } else if (gridType === 2) {
-                    playerDirection = "Northwest";
+                    playerDirection = "North";
                 }
             } else if (dY > pY && (dX === pX || (dX > pX - range && dX < pX + range))) {
+                if (gridType === 2) {
+                    playerDirection = ["Southeast", "Southwest"][Math.floor(Math.random() * 2)];
+                }
                 if (gridType === 4) {
-                    playerDirection = "South"
-                } else if (gridType === 2) {
-                    playerDirection = "Southwest";
+                    playerDirection = "South";
                 }
             } else if (dX < pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
-                if (gridType === 4) {
-                    playerDirection = "Southwest"
-                } else if (gridType === 2) {
+                if (gridType === 2) {
                     playerDirection = "West";
                 }
-            } else if (dX > pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
                 if (gridType === 4) {
-                    playerDirection = "Southeast"
-                } else if (gridType === 2) {
+                    playerDirection = ["Northwest", "Southwest"][Math.floor(Math.random() * 2)];
+                }
+            } else if (dX > pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
+                if (gridType === 2) {
                     playerDirection = "East";
+                }
+                if (gridType === 4) {
+                    playerDirection = ["Northeast", "Southeast"][Math.floor(Math.random() * 2)];
                 }
             } else if (dX < pX && dY < pY) {
                 playerDirection = "Northwest";
@@ -165,7 +169,7 @@ new Dialog({
         }
         const encounterTable = game.tables.entities.find(t => t.name === hexType);
         let weatherRoll = weatherTable.roll().results[0].text;
-        let lostDirection = directions[Math.floor(Math.random() * directions.length)];;
+        let lostDirection = directions[Math.floor(Math.random() * directions.length)];
         let msgContent = '<strong>Weather</strong> ' + weatherRoll + '<br/><br/>';
         let navigator = defaultNavigator;
         if (!navigator) {
