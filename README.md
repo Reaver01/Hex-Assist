@@ -3,6 +3,7 @@ Foundry VTT Module to help make your Hex Crawl more enjoyable. (Currently only s
 
 # Macros
 Included in Hex-Assist are 2 Macros. One to run your hex crawl adventure, and one to make any invisible hex tiles visible again!
+THESE WILL NEED TO BE IMPORTED FROM THE COMPENDIUM WITH EACH NEW RELEASE! Alternatively you can copy and paste the macro content yourself from the included .js files.
 
 # Setup
 Hex-Assist requires some things on your part.
