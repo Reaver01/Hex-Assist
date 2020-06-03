@@ -43,25 +43,12 @@ if (gridType === 2) {
 const range = gridSize / 10;
 let updates = [];
 
-let formContent = `
-<form>
-    <div class="form-group">
-        <label>Hex Type:</label>
-        <select id="hex-type" name="hex-type">
-            <option value="coast">Coast</option>
-            <option value="jungle1">Jungle: No Undead</option>
-            <option value="jungle2">Jungle: Lesser Undead</option>
-            <option value="jungle3">Jungle: Greater Undead</option>
-            <option value="mountains">Mountains</option>
-            <option value="rivers">River</option>
-            <option value="ruins">Ruins</option>
-            <option value="swamp">Swamp</option>
-            <option value="wasteland">Wasteland</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label>Travel Direction:</label>
-        <select id="travel-direction" name="travel-direction">
+let formContent = `<form><div class="form-group"><label>Hex Type:</label><select id="hex-type" name="hex-type">`;
+const tableNames = game.settings.get("Hex-Assist", "tables").split(",");
+tableNames.forEach(name => {
+    formContent += `<option value="` + name + `">` + name + `</option>`;
+});
+formContent += `</select></div><div class="form-group"><label>Travel Direction:</label><select id="travel-direction" name="travel-direction">
 `;
 if (directionMarker) {
     formContent += `<option value="Marker">Marker</option>`;
@@ -72,30 +59,16 @@ if (gridType === 2) {
 if (gridType === 4) {
     formContent += `<option value="North">North</option>`;
 }
-formContent += `<option value="Northeast">Northeast</option>
-                <option value="Northwest">Northwest</option>`;
+formContent += `<option value="Northeast">Northeast</option><option value="Northwest">Northwest</option>`;
 if (gridType === 4) {
     formContent += `<option value="North">South</option>`;
 }
-formContent += `
-            <option value="Southeast">Southeast</option>
-            <option value="Southwest">Southwest</option>`;
+formContent += `<option value="Southeast">Southeast</option><option value="Southwest">Southwest</option>`;
 
 if (gridType === 2) {
     formContent += `<option value="West">West</option>`;
 }
-formContent += `
-        </select>
-    </div>
-    <div class="form-group">
-        <label>Travel Type:</label>
-        <select id="travel-type" name="travel-type">
-            <option value="on-foot">On Foot</option>
-            <option value="canoe">By Canoe</option>
-        </select>
-    </div>
-</form>
-`;
+formContent += `</select></div><div class="form-group"><label>Travel Type:</label><select id="travel-type" name="travel-type"><option value="on-foot">On Foot</option><option value="canoe">By Canoe</option></select></div></form>`;
 
 let pace = 'none';
 new Dialog({
@@ -162,13 +135,18 @@ new Dialog({
                 playerDirection = "Southeast";
             }
         }
-        const weatherTable = game.tables.entities.find(t => t.name === "weather");
         let directions = ["North", "Northeast", "Northwest", "South", "Southeast", "Southwest"];
         if (gridType === 2) {
             directions = ["West", "Northeast", "Northwest", "East", "Southeast", "Southwest"];
         }
         const encounterTable = game.tables.entities.find(t => t.name === hexType);
-        let weatherRoll = weatherTable.roll().results[0].text;
+        const weatherTable = game.tables.entities.find(t => t.name === game.settings.get("Hex-Assist", "weather"));
+        let weatherRoll = "";
+        if (weatherTable) {
+            weatherRoll = weatherTable.roll().results[0].text;
+        } else {
+            weatherRoll = ["Light Rain", "Heavy Rain", "Tropical Storm"][Math.floor(Math.random() * 3)]
+        }
         let lostDirection = directions[Math.floor(Math.random() * directions.length)];
         let msgContent = '<strong>Weather</strong> ' + weatherRoll + '<br/><br/>';
         let navigator = defaultNavigator;

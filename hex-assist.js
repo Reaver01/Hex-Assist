@@ -1,10 +1,4 @@
 const HexAssist = (() => {
-    // VERSION INFORMATION
-    const HexAssist_Author = "Reaver01";
-    const HexAssist_Version = "0.0.2";
-
-    // FUNCTIONS
-    // Handles Token Movement.
     const hookOnUpdateToken = function(scene, actor) {
 
         const gridType = scene.data.gridType;
@@ -48,11 +42,23 @@ const HexAssist = (() => {
 
     };
 
-    // HOOKS
     Hooks.on("ready", function() {
         Hooks.on("updateToken", (scene, actorData) => {
             hookOnUpdateToken(scene, actorData);
         });
+
+        const tableNames = game.settings.get("Hex-Assist", "tables").split(",");
+        let missingTables = [];
+        tableNames.forEach(name => {
+            let table = game.tables.entities.find(t => t.name === name);
+            if (!table) {
+                missingTables.push(name);
+            }
+        });
+        if (missingTables.length > 0) {
+            ui.notifications.error("Please configure table names in settings or rename your tables and reload the world.", {permanent: true});
+            ui.notifications.error("Your world is missing the following tables for Hex Assist: " + missingTables.join(", "), {permanent: true});
+        }
     });
 
     Hooks.once("init", () => {
@@ -118,6 +124,22 @@ const HexAssist = (() => {
             scope: "world",
             config: true,
             default: "Direction Marker",
+            type: String
+        });
+        game.settings.register("Hex-Assist", "tables", {
+            name: "Encounter Table names (csv)",
+            hint: "Comma Separated list of tables to use for your adventure.",
+            scope: "world",
+            config: true,
+            default: "Coast,Jungle: No Undead,Jungle: Lesser Undead,Jungle: Greater Undead,Mountains,River,Ruins,Swamp,Wasteland",
+            type: String
+        });
+        game.settings.register("Hex-Assist", "weather", {
+            name: "Weather Table Name",
+            hint: "Name of table Hex Assist macro should use for weather. Will use standard weather if none found",
+            scope: "world",
+            config: true,
+            default: "Weather",
             type: String
         });
     });

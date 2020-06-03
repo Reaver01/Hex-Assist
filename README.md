@@ -9,8 +9,8 @@ Hex-Assist requires some things on your part.
 - Marker Tokens: A token named Player Location for the players to see their location, a GM token (hidden) named Actual Location, and optionally a third player-controlled token named Direction Marker. The token names are configurable in settings.
 - Hex Tiles: You will need to make sure the Fog of War tile you use has the same name for every Fog of War tile. For now, this does not support multiple tiles. You can configure the name in the settings.
 - Rollable Tables: The macro uses various rollable tables for morning/afternoon/evening events. I would include these, but the ones I have are straight out of ToA and I can't distribute them.
-- Table names: coast, jungle1, jungle2, jungle3, mountains, rivers, ruins, swamp, wasteland, cache, treasure, weather, deadexplorers
-The names are self-explanatory.
+- Configurable Encounter Table names: Coast,Jungle: No Undead, Jungle: Lesser Undead, Jungle: Greater Undead, Mountains, River, Ruins, Swamp, Wasteland
+- Optional and configurable Weather Table name: Weather
 
 # Use
 - Once you've got everything setup, you need to select your navigator (the one that will be making a blind survival check, I reccomend keeping all the player tokens on the map in the GM layer for easy selection) and press the Hex Crawler macro.
