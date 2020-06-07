@@ -157,6 +157,7 @@ new Dialog({
             return;
         }
         let wis = navigator.data.data.abilities.wis.mod;
+        let survivalDC = 10;
         let survival = new Roll(`1d20`).roll().total + wis;
         let survival2 = new Roll(`1d20`).roll().total + wis;
         if (weatherRoll.indexOf('Tropical storm') > -1 && survival > survival2) {
@@ -194,7 +195,11 @@ new Dialog({
             return;
         }
 
-        if (survival < 10) {
+        if (Number(encounterTable.data.description)) {
+            survivalDC = Number(encounterTable.data.description);
+        }
+
+        if (survival < survivalDC) {
             msgContent += '<strong>Party is Lost:</strong> Move actual location ' + hexesMoved + ' ' + hexText + ' to the ' + lostDirection + '<br/><br/>';
             if (locationMarker) {
                 switch (lostDirection) {

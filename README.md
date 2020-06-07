@@ -11,6 +11,7 @@ Hex-Assist requires some things on your part.
 - Hex Tiles: You will need to make sure the Fog of War tile you use has the same name for every Fog of War tile. For now, this does not support multiple tiles. You can configure the name in the settings.
 - Rollable Tables: The macro uses various rollable tables for morning/afternoon/evening events. I would include these, but the ones I have are straight out of ToA and I can't distribute them.
 - Configurable Encounter Table names: Coast,Jungle: No Undead, Jungle: Lesser Undead, Jungle: Greater Undead, Mountains, River, Ruins, Swamp, Wasteland
+- Put Survival Check DC for the area in the Description Field. If nothing is put there, or it's not a number then 10 will be used.
 - Optional and configurable Weather Table name: Weather
 
 # Use
