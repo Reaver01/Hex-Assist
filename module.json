@@ -3,9 +3,9 @@
 	"title": "Hex Crawl Assist",
 	"author": "Reaver01",
 	"description": "Automatically reveals nearby hexes for hex crawls.",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"minimumCoreVersion": "0.5.7",
-    "compatibleCoreVersion": "0.6.1",
+    "compatibleCoreVersion": "0.6.2",
 	"scripts": ["./hex-assist.js"],
 	"styles": [],
 	"packs": [{
