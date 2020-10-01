@@ -13,7 +13,7 @@ if (canvas.tokens.controlled.length === 0 && !navigatorName) {
 const currentScene = canvas.scene;
 const gridType = currentScene.data.gridType;
 
-if (gridType !== 4 && gridType !== 2) {
+if (gridType < 2 && gridType > 5) {
     return ui.notifications.error("The current grid is not a Hex Grid!");
 }
 
@@ -35,7 +35,7 @@ const horizontal = gridSize * 0.866666;
 let diagVertical = gridSize * 0.433333;
 let diagHorizontal = gridSize * 0.75;
 
-if (gridType === 2) {
+if (gridType === 2 || gridType === 3) {
     diagVertical = gridSize * 0.75;
     diagHorizontal = gridSize * 0.433333;
 }
@@ -53,19 +53,19 @@ formContent += `</select></div><div class="form-group"><label>Travel Direction:<
 if (directionMarker) {
     formContent += `<option value="Marker">Marker</option>`;
 }
-if (gridType === 2) {
+if (gridType === 2 || gridType === 3) {
     formContent += `<option value="East">East</option>`;
 }
-if (gridType === 4) {
+if (gridType === 4 || gridType === 5) {
     formContent += `<option value="North">North</option>`;
 }
 formContent += `<option value="Northeast">Northeast</option><option value="Northwest">Northwest</option>`;
-if (gridType === 4) {
+if (gridType === 4 || gridType === 5) {
     formContent += `<option value="North">South</option>`;
 }
 formContent += `<option value="Southeast">Southeast</option><option value="Southwest">Southwest</option>`;
 
-if (gridType === 2) {
+if (gridType === 2 || gridType === 3) {
     formContent += `<option value="West">West</option>`;
 }
 formContent += `</select></div><div class="form-group"><label>Travel Type:</label><select id="travel-type" name="travel-type"><option value="on-foot">On Foot</option><option value="canoe">By Canoe</option></select></div></form>`;
@@ -98,31 +98,31 @@ new Dialog({
         let playerDirection = html.find('[name="travel-direction"]')[0].value;
         if (playerDirection === "Marker") {
             if (dY < pY && (dX === pX || (dX > pX - range && dX < pX + range))) {
-                if (gridType === 2) {
+                if (gridType === 2 || gridType === 3) {
                     playerDirection = ["Northeast", "Northwest"][Math.floor(Math.random() * 2)];
                 }
-                if (gridType === 4) {
+                if (gridType === 4 || gridType === 5) {
                     playerDirection = "North";
                 }
             } else if (dY > pY && (dX === pX || (dX > pX - range && dX < pX + range))) {
-                if (gridType === 2) {
+                if (gridType === 2 || gridType === 3) {
                     playerDirection = ["Southeast", "Southwest"][Math.floor(Math.random() * 2)];
                 }
-                if (gridType === 4) {
+                if (gridType === 4 || gridType === 5) {
                     playerDirection = "South";
                 }
             } else if (dX < pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
-                if (gridType === 2) {
+                if (gridType === 2 || gridType === 3) {
                     playerDirection = "West";
                 }
-                if (gridType === 4) {
+                if (gridType === 4 || gridType === 5) {
                     playerDirection = ["Northwest", "Southwest"][Math.floor(Math.random() * 2)];
                 }
             } else if (dX > pX && (dX === pX || (dY > pY - range && dY < pY + range))) {
-                if (gridType === 2) {
+                if (gridType === 2 || gridType === 3) {
                     playerDirection = "East";
                 }
-                if (gridType === 4) {
+                if (gridType === 4 || gridType === 5) {
                     playerDirection = ["Northeast", "Southeast"][Math.floor(Math.random() * 2)];
                 }
             } else if (dX < pX && dY < pY) {
@@ -136,7 +136,7 @@ new Dialog({
             }
         }
         let directions = ["North", "Northeast", "Northwest", "South", "Southeast", "Southwest"];
-        if (gridType === 2) {
+        if (gridType === 2 || gridType === 3) {
             directions = ["West", "Northeast", "Northwest", "East", "Southeast", "Southwest"];
         }
         const encounterTable = game.tables.entities.find(t => t.name === hexType);
