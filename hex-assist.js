@@ -3,7 +3,7 @@ const HexAssist = (() => {
 
         const gridType = scene.data.gridType;
 
-        if (!game.user.isGM || actor.name !== game.settings.get("Hex-Assist", "tokenName") || (gridType !== 4 && gridType !== 2)) {
+        if (!game.user.isGM || actor.name !== game.settings.get("Hex-Assist", "tokenName") || (gridType < 2 && gridType > 5)) {
             return;
         }
 
@@ -11,7 +11,7 @@ const HexAssist = (() => {
         const v0 = gridSize * 0.866666;
         let v1 = gridSize * 0.433333;
         let v2 = gridSize * 0.75;
-        if (gridType === 2) {
+        if (gridType === 2 || gridType === 3) {
             v1 = gridSize * 0.75;
             v2 = gridSize * 0.433333;
         }
@@ -19,12 +19,12 @@ const HexAssist = (() => {
         const sceneTiles = canvas.scene.data.tiles.reduce((updates, t) => {
             if (t.img.indexOf(game.settings.get("Hex-Assist", "tileName")) > -1 && t.hidden === false && (
                     (t.x > actor.x - range && t.x < actor.x + range && t.y > actor.y - range && t.y < actor.y + range) ||
-                    (gridType === 4 && (t.x > actor.x - range && t.x < actor.x + range && t.y > actor.y + v0 - range && t.y < actor.y + v0 + range)) ||
-                    (gridType === 2 && (t.y > actor.y - range && t.y < actor.y + range && t.x > actor.x + v0 - range && t.x < actor.x + v0 + range)) ||
+                    ((gridType === 4 || gridType === 5) && (t.x > actor.x - range && t.x < actor.x + range && t.y > actor.y + v0 - range && t.y < actor.y + v0 + range)) ||
+                    ((gridType === 2 || gridType === 3) && (t.y > actor.y - range && t.y < actor.y + range && t.x > actor.x + v0 - range && t.x < actor.x + v0 + range)) ||
                     (t.x > actor.x - v2 - range && t.x < actor.x - v2 + range && t.y > actor.y + v1 - range && t.y < actor.y + v1 + range) ||
                     (t.x > actor.x + v2 - range && t.x < actor.x + v2 + range && t.y > actor.y + v1 - range && t.y < actor.y + v1 + range) ||
-                    (gridType === 4 && (t.x > actor.x - range && t.x < actor.x + range && t.y > actor.y - v0 - range && t.y < actor.y - v0 + range)) ||
-                    (gridType === 2 && (t.y > actor.y - range && t.y < actor.y + range && t.x > actor.x - v0 - range && t.x < actor.x - v0 + range)) ||
+                    ((gridType === 4 || gridType === 5) && (t.x > actor.x - range && t.x < actor.x + range && t.y > actor.y - v0 - range && t.y < actor.y - v0 + range)) ||
+                    ((gridType === 2 || gridType === 3) && (t.y > actor.y - range && t.y < actor.y + range && t.x > actor.x - v0 - range && t.x < actor.x - v0 + range)) ||
                     (t.x > actor.x - v2 - range && t.x < actor.x - v2 + range && t.y > actor.y - v1 - range && t.y < actor.y - v1 + range) ||
                     (t.x > actor.x + v2 - range && t.x < actor.x + v2 + range && t.y > actor.y - v1 - range && t.y < actor.y - v1 + range)
                 )) {
